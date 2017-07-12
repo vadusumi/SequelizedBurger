@@ -3,34 +3,34 @@ var express = require("express");
 
 var router = express.Router();
 
-var burger = require("../models/burger.js");
+var db = require("../models");
 
 
-router.get("/", function(req, res){
-	burger.selectAll(function(data){
-		var handleBurgers = {
-			burgers: data
-		};
-		console.log(JSON.parse(JSON.stringify(handleBurgers)));
-		var burgerList = handleBurgers.burgers;
-		console.log(burgerList)
-		res.render("index", {burgerList});
+module.exports = function(app){
+
+	app.get("/", function(req, res){
+		db.Burger.findAll({}).then(function(dbBurger) {
+	      res.json(dbBurger);
+	    });
 	});
-});
 
 
-router.post("/", function(req, res) {
-	burger.insertOne(req.body.name, function(){
-		res.redirect("/");
+	app.post("/", function(req, res) {
+		db.Burger.create({
+			burger_name: req.body.burger_name
+		}).then(function(dbBurger){
+			res.json(dbBurger);
+			res.redirect("/");
+		});
 	});
-});
 
 
-router.put("/:id", function(req, res){
-	burger.updateOne(req.body.devoured, function(){
-		res.redirect("/");
+	app.put("/:id", function(req, res){
+		db.Burger.update({
+			devoured: true
+		}).then(function(dbBurger){
+			res.json(dbBurger);
+			res.redirect("/");
+		});
 	});
-});
-
-
-module.exports = router;
+};
